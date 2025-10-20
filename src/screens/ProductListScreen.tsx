@@ -20,7 +20,7 @@ import { Colors } from "../constants/Colors";
 import Loading from "../components/Loading";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { useCashStore } from "../stores/cashStore";
-
+import { useAuthStore } from "../stores/authStore";
 // type Props = NativeStackScreenProps<RootStackParamList, "ProductList">;
 type Props = BottomTabScreenProps<RootStackParamList, "ProductList">;
 
@@ -43,6 +43,8 @@ export default function ProductListScreen({ navigation }: Props) {
     (state) => state.fetchNotifications
   );
   const { fetchCash, cash, loading: loadingCash } = useCashStore();
+  const { role, setRole } = useAuthStore();
+  const id = useAuthStore((state) => state.user?.id);
 
   const fetchProducts = async () => {
     const { data, error } = await supabase
@@ -88,6 +90,32 @@ export default function ProductListScreen({ navigation }: Props) {
     setPrevCount(unreadCount);
   }, [unreadCount]);
 
+  useEffect(() => {
+    if (role !== "" && role !== null) {
+      return;
+    }
+
+    const fetchRole = async () => {
+      try {
+        const { data: roleData, error } = await supabase
+          .from("role")
+          .select("role_name")
+          .eq("user_id", id)
+          .single();
+
+        if (error && error.code !== "PGRST116") {
+          console.error("Error fetching role:", error);
+        }
+
+        setRole(roleData?.role_name || null);
+      } catch (error) {
+        console.error("Fetch failed:", error);
+      }
+    };
+
+    fetchRole();
+  }, [id, setRole]);
+
   if (products.length < 1 && !refreshing) {
     return <Loading visible={true} onRequestClose={() => {}} />;
   }
@@ -99,12 +127,13 @@ export default function ProductListScreen({ navigation }: Props) {
         <View style={styles.header}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
             <FontAwesome6 name="dollar" size={16} color={Colors.black} />
-            <Text style={styles.buttonText}>
+            <Text style={styles.cashOnHandText}>
               {loadingCash ? (
                 <ActivityIndicator size="small" color={Colors.black} />
               ) : (
                 (cash[0]?.nominal || 0).toLocaleString("id-ID") || "0"
-              )}
+              )}{" "}
+              (COH)
             </Text>
           </View>
 
@@ -187,5 +216,10 @@ const styles = StyleSheet.create({
     color: Colors.white,
     fontSize: 12,
     fontFamily: "MontserratBold",
+  },
+  cashOnHandText: {
+    color: Colors.black,
+    fontSize: 20,
+    fontFamily: "MontserratRegular",
   },
 });

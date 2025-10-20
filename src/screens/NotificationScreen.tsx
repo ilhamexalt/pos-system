@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  Image,
 } from "react-native";
 import { useNotificationStore } from "../stores/notificationStore";
 import NotificationItem from "../components/NotificationItem";
@@ -80,7 +81,13 @@ export default function NotificationScreen() {
             <NotificationItem notification={item} onMarkAsRead={markAsRead} />
           )}
           ListEmptyComponent={
-            <Text style={styles.empty}>No notifications</Text>
+            <View>
+              <Image
+                source={require("../../assets/gif/empty.gif")}
+                style={styles.imageEmpty}
+              />
+              <Text style={styles.empty}>Your notification is empty</Text>
+            </View>
           }
           refreshing={refreshing}
           onRefresh={onRefresh}
@@ -109,10 +116,15 @@ const styles = StyleSheet.create({
   },
   empty: {
     textAlign: "center",
-    marginTop: 50,
-    fontSize: 16,
+    // marginTop: 50,
+    fontSize: 12,
     color: Colors.secondary,
     fontFamily: "MontserratRegular",
+  },
+  imageEmpty: {
+    width: "auto",
+    height: 250,
+    marginTop: 150,
   },
   categoryText: {
     color: Colors.primary,

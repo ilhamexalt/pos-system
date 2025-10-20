@@ -22,15 +22,54 @@ import Constants from "expo-constants";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Account">;
 
+// --- Interface Props ---
+interface SettingsListItemProps {
+  iconName: keyof typeof FontAwesome6.glyphMap;
+  labelText: string;
+  onPress: () => void;
+}
+
+const SettingsListItem: React.FC<SettingsListItemProps> = ({
+  iconName,
+  labelText,
+  onPress,
+}) => {
+  return (
+    <TouchableOpacity
+      style={styles.infoItem}
+      activeOpacity={0.9}
+      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+      onPress={onPress}
+    >
+      <FontAwesome6
+        name={iconName}
+        size={22}
+        color={Colors.secondary}
+        style={styles.infoIcon}
+      />
+
+      <Text style={styles.infoText}>{labelText}</Text>
+
+      <Ionicons
+        name="chevron-forward-outline"
+        size={20}
+        color={Colors.secondary}
+      />
+    </TouchableOpacity>
+  );
+};
+
 export default function AccountScreen({ navigation }: Props) {
-  const appVersion = Constants?.manifest?.version || "1.0.0";
-  const appName = Constants?.manifest?.name || "My App";
   const signOut = useAuthStore((state) => state.signOut);
   const user = useAuthStore((state) => state.user);
   const scale = useRef(new Animated.Value(1)).current;
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const role = useAuthStore((state) => state.role);
+
+  const config = Constants.expoConfig;
+  const appVersion = config?.version || "1.0.0";
+  const appName = config?.name || "My App";
 
   const pressIn = () => {
     Animated.spring(scale, {
@@ -61,6 +100,35 @@ export default function AccountScreen({ navigation }: Props) {
     }
   };
 
+  const accountMenuItems = [
+    {
+      iconName: "user-gear",
+      labelText: "Edit Profile",
+      onPress: () => setErrorMessage("Feature Not Available"),
+    },
+    {
+      iconName: "pencil",
+      labelText: "Add Transaction",
+      onPress: () => navigation.navigate("AddTransaction"),
+    },
+    {
+      iconName: "file-archive",
+      labelText: "Products",
+      onPress: () => {
+        if (role === "admin") {
+          navigation.navigate("Products");
+        } else {
+          setErrorMessage("You don't have access");
+        }
+      },
+    },
+    {
+      iconName: "circle-info",
+      labelText: "Help Center",
+      onPress: () => setErrorMessage("Feature Not Available"),
+    },
+  ];
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {/* HEADER PROFILE CARD */}
@@ -81,90 +149,15 @@ export default function AccountScreen({ navigation }: Props) {
 
       {/* ACCOUNT INFO LIST */}
       <View style={styles.infoList}>
-        <TouchableOpacity
-          style={styles.infoItem}
-          activeOpacity={0.9}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          onPress={() => setErrorMessage("Feature Not Available")}
-        >
-          <FontAwesome6
-            name="user-gear"
-            size={22}
-            color={Colors.secondary}
-            style={styles.infoIcon}
+        {/* --- LOOPING ITEM MENU --- */}
+        {accountMenuItems.map((item, index) => (
+          <SettingsListItem
+            key={index}
+            iconName={item.iconName as any}
+            labelText={item.labelText}
+            onPress={item.onPress}
           />
-          <Text style={styles.infoText}>Edit Profile</Text>
-          <Ionicons
-            name="chevron-forward-outline"
-            size={20}
-            color={Colors.secondary}
-          />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.infoItem}
-          activeOpacity={0.9}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          onPress={() => navigation.navigate("AddTransaction")}
-        >
-          <FontAwesome6
-            name="pencil"
-            size={22}
-            color={Colors.secondary}
-            style={styles.infoIcon}
-          />
-          <Text style={styles.infoText}>Add Transaction</Text>
-          <Ionicons
-            name="chevron-forward-outline"
-            size={20}
-            color={Colors.secondary}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.infoItem}
-          activeOpacity={0.9}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          onPress={() => {
-            if (role === "admin") {
-              navigation.navigate("Products");
-            } else {
-              setErrorMessage("You don't have access");
-            }
-          }}
-        >
-          <FontAwesome6
-            name="file-archive"
-            size={22}
-            color={Colors.secondary}
-            style={styles.infoIcon}
-          />
-          <Text style={styles.infoText}>Products</Text>
-          <Ionicons
-            name="chevron-forward-outline"
-            size={20}
-            color={Colors.secondary}
-          />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.infoItem}
-          activeOpacity={0.9}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          onPress={() => setErrorMessage("Feature Not Available")}
-        >
-          <FontAwesome6
-            name="circle-info"
-            size={22}
-            color={Colors.secondary}
-            style={styles.infoIcon}
-          />
-          <Text style={styles.infoText}>Help Center</Text>
-          <Ionicons
-            name="chevron-forward-outline"
-            size={20}
-            color={Colors.secondary}
-          />
-        </TouchableOpacity>
+        ))}
       </View>
 
       {/* LOGOUT BUTTON */}

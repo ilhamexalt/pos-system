@@ -24,58 +24,58 @@ export default function App() {
     MontserratExtraBold: require("./assets/fonts/Montserrat-ExtraBold.ttf"),
   });
 
-  const registerForPushNotificationsAsync = async () => {
-    let token;
-    if (Device.isDevice) {
-      const { status: existingStatus } =
-        await Notifications.getPermissionsAsync();
-      let finalStatus = existingStatus;
+  // const registerForPushNotificationsAsync = async () => {
+  //   let token;
+  //   if (Device.isDevice) {
+  //     const { status: existingStatus } =
+  //       await Notifications.getPermissionsAsync();
+  //     let finalStatus = existingStatus;
 
-      if (existingStatus !== "granted") {
-        const { status } = await Notifications.requestPermissionsAsync();
-        finalStatus = status;
-      }
+  //     if (existingStatus !== "granted") {
+  //       const { status } = await Notifications.requestPermissionsAsync();
+  //       finalStatus = status;
+  //     }
 
-      if (finalStatus !== "granted") {
-        alert("Failed to get push token!");
-        return;
-      }
+  //     if (finalStatus !== "granted") {
+  //       alert("Failed to get push token!");
+  //       return;
+  //     }
 
-      token = (await Notifications.getExpoPushTokenAsync()).data;
-      console.log("Expo Push Token:", token);
-    } else {
-      alert("Must use physical device for Push Notifications");
-    }
+  //     token = (await Notifications.getExpoPushTokenAsync()).data;
+  //     console.log("Expo Push Token:", token);
+  //   } else {
+  //     alert("Must use physical device for Push Notifications");
+  //   }
 
-    if (Platform.OS === "android") {
-      Notifications.setNotificationChannelAsync("default", {
-        name: "default",
-        importance: Notifications.AndroidImportance.MAX,
-        vibrationPattern: [0, 250, 250, 250],
-        lightColor: "#FF231F7C",
-      });
-    }
+  //   if (Platform.OS === "android") {
+  //     Notifications.setNotificationChannelAsync("default", {
+  //       name: "default",
+  //       importance: Notifications.AndroidImportance.MAX,
+  //       vibrationPattern: [0, 250, 250, 250],
+  //       lightColor: "#FF231F7C",
+  //     });
+  //   }
 
-    return token;
-  };
+  //   return token;
+  // };
 
-  useEffect(() => {
-    registerForPushNotificationsAsync();
+  // useEffect(() => {
+  //   registerForPushNotificationsAsync();
 
-    const subscription = Notifications.addNotificationReceivedListener(
-      (notification) => {
-        console.log("Received notification:", notification);
-        Notifications.addNotificationReceivedListener((notification) => {
-          Alert.alert(
-            "New Notification!",
-            notification.request.content.body ?? "You have a new notification"
-          );
-        });
-      }
-    );
+  //   const subscription = Notifications.addNotificationReceivedListener(
+  //     (notification) => {
+  //       console.log("Received notification:", notification);
+  //       Notifications.addNotificationReceivedListener((notification) => {
+  //         Alert.alert(
+  //           "New Notification!",
+  //           notification.request.content.body ?? "You have a new notification"
+  //         );
+  //       });
+  //     }
+  //   );
 
-    return () => subscription.remove();
-  }, []);
+  //   return () => subscription.remove();
+  // }, []);
 
   useEffect(() => {
     const prepare = async () => {

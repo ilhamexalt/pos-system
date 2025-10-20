@@ -1,6 +1,9 @@
 import React, { useEffect } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { NavigationContainer } from "@react-navigation/native";
+import {
+  NavigationContainer,
+  useNavigationContainerRef,
+} from "@react-navigation/native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 // Screens
@@ -21,11 +24,19 @@ import NotificationScreen from "../screens/NotificationScreen";
 import AccountScreen from "../screens/AccountScreen";
 import CheckoutScreen from "../screens/CheckoutScreen";
 import { Colors } from "../constants/Colors";
-import { TouchableOpacity } from "react-native";
+import { Platform, TouchableOpacity } from "react-native";
 import AddTransaction from "../screens/AddTransaction";
 import ProductScreen from "../screens/ProductScreen";
 
+import * as Notifications from "expo-notifications";
+import * as Device from "expo-device";
+import { doc, setDoc } from "firebase/firestore";
+import { db } from "../config/firebase";
+import { VALID_SCREENS, ValidScreenName } from "../constants/InitScreen";
+import * as Asset from "expo-asset";
+
 const Tab = createBottomTabNavigator<RootStackParamList>();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function Tabs() {
   const insets = useSafeAreaInsets();
@@ -77,8 +88,9 @@ function Tabs() {
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               style={{
                 top: -25,
-                left: 30,
-                right: 30,
+                left: 0,
+                right: 0,
+                alignSelf: "center",
                 justifyContent: "center",
                 alignItems: "center",
                 backgroundColor: Colors.primary,
@@ -102,11 +114,125 @@ function Tabs() {
   );
 }
 
-const Stack = createNativeStackNavigator<RootStackParamList>();
+const registerForPushNotificationsAsync = async (userId: string) => {
+  let token;
+  if (!Device.isDevice) return;
+
+  const { status: existingStatus } = await Notifications.getPermissionsAsync();
+  let finalStatus = existingStatus;
+
+  if (existingStatus !== "granted") {
+    const { status } = await Notifications.requestPermissionsAsync();
+    finalStatus = status;
+  }
+
+  if (finalStatus !== "granted") {
+    console.error("Permission for notifications not granted");
+    return;
+  }
+
+  token = (await Notifications.getExpoPushTokenAsync()).data;
+
+  // --- SIMPAN TOKEN KE FIRESTORE ---
+  if (token && userId) {
+    try {
+      const tokenRef = doc(db, "PushTokens", userId);
+      await setDoc(
+        tokenRef,
+        {
+          token: token,
+          userId: userId,
+          platform: Platform.OS,
+          timestamp: new Date().toISOString(),
+        },
+        { merge: true }
+      );
+    } catch (e) {
+      console.error("Gagal menyimpan token ke Firestore:", e);
+    }
+  }
+  return token;
+};
+
+const audioSource = require("../../assets/sound/happy-bells.wav");
 
 export default function AppNavigation() {
   const initialize = useAuthStore((state) => state.initialize);
   const session = useAuthStore((state) => state.session);
+  const user_id = useAuthStore((state) => state.user?.id);
+  const navigationRef = useNavigationContainerRef<RootStackParamList>();
+
+  let customSoundUri: string | null = null;
+  async function setupNotifications() {
+    if (Platform.OS === "android") {
+      const asset = await Asset.Asset.fromModule(audioSource).downloadAsync();
+      customSoundUri = asset.localUri ?? asset.uri;
+
+      if (customSoundUri) {
+        Notifications.setNotificationChannelAsync("default", {
+          name: "Default",
+          importance: Notifications.AndroidImportance.MAX,
+          sound: customSoundUri,
+          vibrationPattern: [0, 250, 250, 250],
+          lightColor: "#FF231F7C",
+        });
+      }
+    }
+
+    Notifications.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldPlaySound: true, // Menentukan apakah sistem harus memutar suara notifikasi saat notifikasi diterima (baik saat foreground maupun background).
+        shouldSetBadge: true, //Menentukan apakah sistem harus mengubah angka (badge) pada ikon aplikasi di homescreen perangkat.
+
+        shouldShowBanner: true, // Untuk menampilkan notifikasi sebagai banner/toast (Android & iOS)
+        shouldShowList: true, // Untuk menampilkan di daftar notifikasi saat app dibuka (hanya iOS)
+      }),
+    });
+  }
+
+  useEffect(() => {
+    if (user_id) {
+      registerForPushNotificationsAsync(user_id);
+    }
+
+    const receivedListener = Notifications.addNotificationReceivedListener(
+      (notification) => {
+        const data = notification.request.content;
+        console.log("Notifikasi diterima:", data.body);
+      }
+    );
+
+    const responseListener =
+      Notifications.addNotificationResponseReceivedListener((response) => {
+        const data = response.notification.request.content.data as {
+          [key: string]: unknown;
+        };
+
+        const { screen } = data;
+
+        if (typeof screen !== "string" || !navigationRef.isReady()) {
+          alert("Sampaikan error ini ke tim pengembang!");
+          return;
+        }
+
+        if (VALID_SCREENS.includes(screen as ValidScreenName)) {
+          const targetScreen = screen as keyof RootStackParamList;
+
+          navigationRef.navigate(targetScreen);
+        } else {
+          alert("Sampaikan error ini ke tim pengembang! #" + screen);
+        }
+      });
+
+    return () => {
+      receivedListener.remove();
+      responseListener.remove();
+    };
+  }, [user_id, navigationRef]);
+
+  useEffect(() => {
+    setupNotifications();
+  }, []);
 
   useEffect(() => {
     initialize();
@@ -114,7 +240,7 @@ export default function AppNavigation() {
 
   return (
     <SafeAreaProvider>
-      <NavigationContainer>
+      <NavigationContainer ref={navigationRef}>
         <Stack.Navigator
           screenOptions={{
             headerShown: false,
@@ -135,18 +261,19 @@ export default function AppNavigation() {
             <Stack.Screen name="Login" component={LoginScreen} />
           ) : (
             <>
-              <Stack.Screen name="Main" component={Tabs} />
+              <Stack.Screen
+                name="Main"
+                component={Tabs}
+                options={{
+                  title: "",
+                }}
+              />
               <Stack.Screen
                 name="Notifications"
                 component={NotificationScreen}
                 options={{
                   title: "Notifications",
                   headerShown: true,
-                  headerRight: () => (
-                    <TouchableOpacity style={{ marginRight: 0 }}>
-                      <Ionicons name="notifications" size={24} color="#fff" />
-                    </TouchableOpacity>
-                  ),
                 }}
               />
               <Stack.Screen

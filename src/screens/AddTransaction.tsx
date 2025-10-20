@@ -24,6 +24,30 @@ export default function AddTransaction() {
   const [message, setMessage] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("cash");
 
+  const formatToIDR = (value: string) => {
+    const numericValue = value.replace(/[^0-9]/g, "");
+
+    if (!numericValue) {
+      return "";
+    }
+
+    const formatted = new Intl.NumberFormat("id-ID").format(
+      Number(numericValue)
+    );
+
+    return formatted;
+  };
+
+  const handleAmountChange = (text: string) => {
+    const formattedText = formatToIDR(text);
+    setAmount(formattedText);
+  };
+
+  const getRawValue = (formattedValue: string) => {
+    // Hapus semua titik (pemisah ribuan) dan koma (pemisah desimal jika ada)
+    return Number(formattedValue.replace(/\./g, ""));
+  };
+
   const handleSubmit = async () => {
     if (!amount || !description) {
       setMessage("Please fill in all fields.");
@@ -31,7 +55,8 @@ export default function AddTransaction() {
     }
 
     setLoading(true);
-    const parsedAmount = parseFloat(amount.replace(/,/g, ""));
+    // const parsedAmount = parseFloat(amount.replace(/,/g, ""));
+    const parsedAmount = getRawValue(amount);
 
     const { error: transactionError } = await supabase
       .from("transactions")
@@ -86,7 +111,8 @@ export default function AddTransaction() {
         </Text>
         <TextInput
           value={amount}
-          onChangeText={setAmount}
+          // onChangeText={setAmount}
+          onChangeText={handleAmountChange}
           placeholder="e.g., 100000"
           keyboardType="numeric"
           style={styles.input}

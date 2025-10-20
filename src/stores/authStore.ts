@@ -22,6 +22,7 @@ interface AuthState {
   ) => Promise<{ error?: Error | null }>;
   signOut: () => Promise<void>;
   initialize: () => Promise<void>;
+  setRole: (role: string | null) => void;
 }
 
 // const registerForPushNotificationsAsync = async () => {
@@ -64,6 +65,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   role: null,
   setUser: (user: User | null) => set({ user }),
   setSession: (session: Session | null) => set({ session }),
+ setRole: (role: string | null) => set({ role }),
 
   signIn: async (email: string, password: string) => {
     const { data, error } = await supabase.auth.signInWithPassword({

@@ -6,9 +6,10 @@ import {
   Text,
   ActivityIndicator,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   Animated,
   Image,
+  Platform,
+  KeyboardAvoidingView,
 } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types";
@@ -59,7 +60,12 @@ export default function LoginScreen({ navigation }: Props) {
   };
 
   return (
-    <View style={styles.container}>
+    // <View style={styles.container}>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
+    >
       <Text style={styles.title}>POS System</Text>
       <Image
         source={require("../../assets/images/login.png")}
@@ -103,7 +109,7 @@ export default function LoginScreen({ navigation }: Props) {
           style={styles.eyeIcon}
         >
           <Ionicons
-            name={showPassword ? "eye-off-outline" : "eye-outline"}
+            name={showPassword ? "eye-outline" : "eye-off-outline"}
             size={20}
             color={Colors.secondary}
           />
@@ -137,7 +143,9 @@ export default function LoginScreen({ navigation }: Props) {
         iconColor={Colors.red}
         onClose={() => setErrorMessage("")}
       />
-    </View>
+    </KeyboardAvoidingView>
+
+    // </View>
   );
 }
 
@@ -175,6 +183,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "MontserratRegular",
     color: Colors.secondary,
+    height: 50,
   },
   eyeIcon: {
     padding: 5,
@@ -200,7 +209,7 @@ const styles = StyleSheet.create({
   image: {
     width: "auto",
     height: 200,
-    resizeMode: "center",
+    resizeMode: "contain",
     marginBottom: 30,
   },
 });

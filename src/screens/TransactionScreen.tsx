@@ -135,7 +135,7 @@ export default function TransactionScreen() {
             >
               <Ionicons
                 name="alert-circle-outline"
-                size={16}
+                size={18}
                 color={Colors.primary}
               />
             </TouchableOpacity>

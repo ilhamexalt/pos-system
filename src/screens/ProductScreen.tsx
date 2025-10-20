@@ -10,13 +10,19 @@ import {
   Modal as ModalRN,
   Pressable,
   Alert,
-  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import { Swipeable } from "react-native-gesture-handler";
 import { supabase } from "../config/supabase";
 import { Colors } from "../constants/Colors";
 import { format } from "../utils/format";
 import LoadingComponent from "../components/Loading";
+import ModalCustom from "../components/Modal";
+import { FontAwesome } from "@expo/vector-icons";
 
 type Product = {
   id: string;
@@ -34,6 +40,7 @@ export default function ProductScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
   const [form, setForm] = useState<Partial<Product>>({});
+  const [message, setMessage] = useState<string>("");
 
   useEffect(() => {
     fetchProducts();
@@ -76,6 +83,8 @@ export default function ProductScreen() {
         .eq("id", editing.id);
 
       if (error) Alert.alert("Error", error.message);
+      // setMessage("Product updated successfully.");
+      Alert.alert("Success", "Product updated successfully.");
     } else {
       // Create new
       const { error } = await supabase.from("products").insert([
@@ -90,6 +99,8 @@ export default function ProductScreen() {
       ]);
 
       if (error) Alert.alert("Error", error.message);
+      // setMessage("Product added successfully.");
+      Alert.alert("Success", "Product added successfully.");
     }
 
     closeModal();
@@ -99,13 +110,14 @@ export default function ProductScreen() {
   const handleDelete = async (id: string) => {
     const { error } = await supabase.from("products").delete().eq("id", id);
     if (error) Alert.alert("Error", error.message);
+    // setMessage("Product deleted successfully.");
     fetchProducts();
   };
 
   const renderRightActions = (id: string) => (
     <View style={styles.deleteContainer}>
       <Pressable onPress={() => handleDelete(id)}>
-        <Text style={styles.deleteText}>Delete</Text>
+        <FontAwesome name="trash-o" style={styles.deleteText} />
       </Pressable>
     </View>
   );
@@ -125,7 +137,7 @@ export default function ProductScreen() {
           <Text style={styles.stock}>Stock: {item.in_stock}</Text>
         </View>
         <TouchableOpacity onPress={() => openModal(item)}>
-          <Text style={styles.edit}>Edit</Text>
+          <FontAwesome name="pencil-square-o" style={styles.edit} />
         </TouchableOpacity>
       </View>
     </Swipeable>
@@ -136,20 +148,19 @@ export default function ProductScreen() {
       {loading ? (
         <LoadingComponent />
       ) : (
-        // <ActivityIndicator
-        //   size="large"
-        //   color={Colors.primary}
-        //   style={{ marginTop: 50 }}
-        // />
         <FlatList
           data={products}
           keyExtractor={(item) => item.id}
           renderItem={renderItem}
           contentContainerStyle={{ padding: 12 }}
           ListEmptyComponent={
-            <Text style={{ textAlign: "center", marginTop: 40, color: "#777" }}>
-              No products found
-            </Text>
+            <View>
+              <Image
+                source={require("../../assets/gif/empty.gif")}
+                style={styles.imageEmpty}
+              />
+              <Text style={styles.emptyText}>Your product is empty</Text>
+            </View>
           }
         />
       )}
@@ -161,68 +172,94 @@ export default function ProductScreen() {
 
       {/* Modal Form */}
       <ModalRN visible={modalVisible} animationType="slide" transparent>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalBox}>
-            <Text style={styles.modalTitle}>
-              {editing ? "Edit Product" : "Add Product"}
-            </Text>
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          keyboardVerticalOffset={0}
+        >
+          <TouchableWithoutFeedback
+            onPress={Keyboard.dismiss}
+            accessible={false}
+          >
+            <View style={styles.modalOverlay}>
+              <View style={styles.modalBox}>
+                <Text style={styles.modalTitle}>
+                  {editing ? "Edit Product" : "Add Product"}
+                </Text>
 
-            <TextInput
-              placeholderTextColor={Colors.secondary}
-              style={styles.input}
-              placeholder="Name"
-              value={form.name || ""}
-              onChangeText={(v) => setForm({ ...form, name: v })}
-            />
-            <TextInput
-              placeholderTextColor={Colors.secondary}
-              style={styles.input}
-              placeholder="Description"
-              value={form.description || ""}
-              onChangeText={(v) => setForm({ ...form, description: v })}
-            />
-            <TextInput
-              placeholderTextColor={Colors.secondary}
-              style={styles.input}
-              placeholder="Category"
-              value={form.category || ""}
-              onChangeText={(v) => setForm({ ...form, category: v })}
-            />
-            <TextInput
-              placeholderTextColor={Colors.secondary}
-              style={styles.input}
-              placeholder="Price"
-              keyboardType="numeric"
-              value={form.price?.toString() || ""}
-              onChangeText={(v) => setForm({ ...form, price: Number(v) })}
-            />
-            <TextInput
-              placeholderTextColor={Colors.secondary}
-              style={styles.input}
-              placeholder="In Stock"
-              keyboardType="numeric"
-              value={form.in_stock?.toString() || ""}
-              onChangeText={(v) => setForm({ ...form, in_stock: Number(v) })}
-            />
-            <TextInput
-              placeholderTextColor={Colors.secondary}
-              style={styles.input}
-              placeholder="Image URL"
-              value={form.image || ""}
-              onChangeText={(v) => setForm({ ...form, image: v })}
-            />
+                <TextInput
+                  placeholderTextColor={Colors.secondary}
+                  style={styles.input}
+                  placeholder="Name"
+                  value={form.name || ""}
+                  onChangeText={(v) => setForm({ ...form, name: v })}
+                />
+                <TextInput
+                  placeholderTextColor={Colors.secondary}
+                  style={styles.input}
+                  placeholder="Description"
+                  value={form.description || ""}
+                  onChangeText={(v) => setForm({ ...form, description: v })}
+                />
+                <TextInput
+                  placeholderTextColor={Colors.secondary}
+                  style={styles.input}
+                  placeholder="Category"
+                  value={form.category || ""}
+                  onChangeText={(v) => setForm({ ...form, category: v })}
+                />
+                <TextInput
+                  placeholderTextColor={Colors.secondary}
+                  style={styles.input}
+                  placeholder="Price"
+                  keyboardType="numeric"
+                  value={form.price?.toString() || ""}
+                  onChangeText={(v) => setForm({ ...form, price: Number(v) })}
+                />
+                <TextInput
+                  placeholderTextColor={Colors.secondary}
+                  style={styles.input}
+                  placeholder="In Stock"
+                  keyboardType="numeric"
+                  value={form.in_stock?.toString() || ""}
+                  onChangeText={(v) =>
+                    setForm({ ...form, in_stock: Number(v) })
+                  }
+                />
+                <TextInput
+                  placeholderTextColor={Colors.secondary}
+                  style={styles.input}
+                  placeholder="Image URL"
+                  value={form.image || ""}
+                  onChangeText={(v) => setForm({ ...form, image: v })}
+                />
 
-            <View style={styles.modalActions}>
-              <Pressable style={styles.btnCancel} onPress={closeModal}>
-                <Text style={styles.btnCancelText}>Cancel</Text>
-              </Pressable>
-              <Pressable style={styles.btnSave} onPress={handleSave}>
-                <Text style={styles.btnSaveText}>Save</Text>
-              </Pressable>
+                <View style={styles.modalActions}>
+                  <Pressable style={styles.btnCancel} onPress={closeModal}>
+                    <Text style={styles.btnCancelText}>Cancel</Text>
+                  </Pressable>
+                  <Pressable style={styles.btnSave} onPress={handleSave}>
+                    <Text style={styles.btnSaveText}>Save</Text>
+                  </Pressable>
+                </View>
+              </View>
             </View>
-          </View>
-        </View>
+          </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
       </ModalRN>
+
+      <ModalCustom
+        type="alert"
+        visible={!!message}
+        message={message}
+        iconName={
+          message.includes("successfully")
+            ? "checkmark-circle-outline"
+            : "alert-circle-outline"
+        }
+        iconColor={message.includes("successfully") ? Colors.green : Colors.red}
+        onClose={() => setMessage("")}
+      />
     </View>
   );
 }
@@ -333,4 +370,14 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   btnSaveText: { color: Colors.white, fontFamily: "MontserratSemiBold" },
+  emptyText: {
+    color: Colors.secondary,
+    fontSize: 12,
+    textAlign: "center",
+  },
+  imageEmpty: {
+    width: "auto",
+    height: 250,
+    marginTop: 150,
+  },
 });

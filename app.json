@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "pos-expo",
+    "name": "POS System",
     "slug": "pos-expo",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -21,10 +21,24 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.ilhamexalt33.posexpo",
+      "googleServicesFile": "./google-services.json",
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-audio"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "28f2b6bf-06e3-4582-a93c-2cce23e9c1d8"
+      }
     }
   }
 }

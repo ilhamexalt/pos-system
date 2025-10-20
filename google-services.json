@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "666726160059",
+    "project_id": "pos-system-eab23",
+    "storage_bucket": "pos-system-eab23.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:666726160059:android:c9fa695c16f900c5c4fb9e",
+        "android_client_info": {
+          "package_name": "com.ilhamexalt33.posexpo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDa1-fre9saYyXQdj2wqYEBImSUAjLYiR8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

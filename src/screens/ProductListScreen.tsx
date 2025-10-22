@@ -39,12 +39,16 @@ export default function ProductListScreen({ navigation }: Props) {
   const player = useAudioPlayer(audioSource);
   const [prevCount, setPrevCount] = useState(unreadCount);
   const [refreshing, setRefreshing] = useState(false);
-  const fetchNotifications = useNotificationStore(
-    (state) => state.fetchNotifications
-  );
   const { fetchCash, cash, loading: loadingCash } = useCashStore();
   const { role, setRole } = useAuthStore();
   const id = useAuthStore((state) => state.user?.id);
+  const fetchNotifications = useNotificationStore(
+    (state) => state.fetchNotifications
+  );
+  const subscribeToNotifications = useNotificationStore(
+    (state) => state.subscribeToNotifications
+  );
+  const unsubscribe = useNotificationStore((state) => state.unsubscribe);
 
   const fetchProducts = async () => {
     const { data, error } = await supabase
@@ -66,29 +70,33 @@ export default function ProductListScreen({ navigation }: Props) {
   };
 
   useEffect(() => {
-    // Ambil data awal
-    fetchCash();
-    fetchProducts();
     fetchNotifications();
+    subscribeToNotifications();
 
-    // Subscribe ke notifikasi
-    const subscribe = useNotificationStore.getState().subscribeToNotifications;
-    const unsubscribe = useNotificationStore.getState().unsubscribe;
-    subscribe();
-
-    // Cleanup saat unmount
-    return () => {
-      unsubscribe();
-    };
-  }, []);
-
-  useEffect(() => {
     if (unreadCount > prevCount) {
       player.seekTo(0);
       player.play();
     }
     setPrevCount(unreadCount);
-  }, [unreadCount]);
+
+    return () => {
+      unsubscribe();
+    };
+  }, [fetchNotifications, subscribeToNotifications, unsubscribe]);
+
+  useEffect(() => {
+    // Ambil data awal
+    fetchCash();
+    fetchProducts();
+  }, []);
+
+  // useEffect(() => {
+  //   if (unreadCount > prevCount) {
+  //     player.seekTo(0);
+  //     player.play();
+  //   }
+  //   setPrevCount(unreadCount);
+  // }, [unreadCount]);
 
   useEffect(() => {
     if (role !== "" && role !== null) {

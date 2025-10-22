@@ -1,9 +1,6 @@
 import { create } from "zustand";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "../config/supabase";
-// import * as Notifications from "expo-notifications";
-// import * as Device from "expo-device";
-// import { Platform } from "react-native";
 
 interface AuthState {
   user: User | null;
@@ -25,39 +22,6 @@ interface AuthState {
   setRole: (role: string | null) => void;
 }
 
-// const registerForPushNotificationsAsync = async () => {
-//   let token;
-//   if (Device.isDevice) {
-//     const { status: existingStatus } =
-//       await Notifications.getPermissionsAsync();
-//     let finalStatus = existingStatus;
-
-//     if (existingStatus !== "granted") {
-//       const { status } = await Notifications.requestPermissionsAsync();
-//       finalStatus = status;
-//     }
-
-//     if (finalStatus !== "granted") {
-//       throw new Error("Permission for notifications not granted");
-//     }
-
-//     token = (await Notifications.getExpoPushTokenAsync()).data;
-//     console.log("Expo Push Token:", token);
-
-//     // For Android: set notification channel
-//     if (Platform.OS === "android") {
-//       Notifications.setNotificationChannelAsync("default", {
-//         name: "default",
-//         importance: Notifications.AndroidImportance.MAX,
-//         vibrationPattern: [0, 250, 250, 250],
-//         lightColor: "#FF231F7C",
-//       });
-//     }
-//   }
-
-//   return token;
-// };
-
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   session: null,
@@ -78,19 +42,6 @@ export const useAuthStore = create<AuthState>((set) => ({
         .select("role_name")
         .eq("user_id", data.user.id)
         .single();
-
-      // const token = await registerForPushNotificationsAsync();
-
-      // if (token) {
-      //   await supabase.from("device_tokens").upsert(
-      //     {
-      //       user_id: data.user.id,
-      //       token,
-      //       platform: Device.osName ?? "unknown",
-      //     },
-      //     { onConflict: "user_id" }
-      //   );
-      // }
 
       set({
         user: data.user ?? null,

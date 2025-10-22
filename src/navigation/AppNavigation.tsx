@@ -35,6 +35,7 @@ import {
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { useAudioPlayer } from "expo-audio";
 
 export const navigationRef =
   React.createRef<NavigationContainerRef<RootStackParamList>>();
@@ -47,7 +48,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
-    shouldPlaySound: true, // Menentukan apakah sistem harus memutar suara notifikasi saat notifikasi diterima (baik saat foreground maupun background).
+    shouldPlaySound: false, // Menentukan apakah sistem harus memutar suara notifikasi saat notifikasi diterima (baik saat foreground maupun background).
     shouldSetBadge: true, //Menentukan apakah sistem harus mengubah angka (badge) pada ikon aplikasi di homescreen perangkat.
 
     shouldShowBanner: true, // Untuk menampilkan notifikasi sebagai banner/toast (Android & iOS)
@@ -55,10 +56,13 @@ Notifications.setNotificationHandler({
   }),
 });
 
+const AUDIO = require("../../assets/sound/happy-bells.wav");
+
 const AppNavigation: React.FC = () => {
   const initialize = useAuthStore((state) => state.initialize);
   const session = useAuthStore((state) => state.session);
   const userId = useAuthStore((state) => state.user?.id);
+  const player = useAudioPlayer(AUDIO);
 
   useEffect(() => {
     console.log("Setting up notification listeners...");
@@ -67,6 +71,8 @@ const AppNavigation: React.FC = () => {
     // Listener ketika notifikasi diterima (saat app sedang aktif)
     const notificationSub = Notifications.addNotificationReceivedListener(
       (notification) => {
+        player.seekTo(0);
+        player.play();
         console.log("Notification received:", notification);
       }
     );

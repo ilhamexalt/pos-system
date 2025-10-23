@@ -1,13 +1,29 @@
 {
-  "type": "service_account",
-  "project_id": "pos-system-eab23",
-  "private_key_id": "33b4fbda8b19fa61dfc3f5e73722531e2799a76c",
-  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCJgtrVKZh9x8t+\nV1JhsP1XZcSPRBX2ugcnvOkzInDKSpSWeM+ZtzOL927/z1S3YkE6d5Nhia9JnCxa\nePARzPQODJiReYek4MjcA1HnHQnVd0WizanljUuKBItNP753+J8Z5NlSgQWOu05W\nxTPvDLMmjrdKdMRz0mpNOg82ca1PvBkgSyJvFoYIprk3phdUS1royFHgyzifxXYH\nOu9IL8o7q8yHPbLaDMTZhvJx44uCDnJCQfspg19J5eTyxYkwB573cuTeug30snrG\nlqeC6DFo5rQp4/wAd2ohhqvTMRiZxMNJtf39Nq/KtavDwg9gSSb/B50gPO02rtmS\nE0xie+OFAgMBAAECggEAFfqXVZjXactEaEY2wayTYaO/fhKo3A2x1RUpxOWNV5gC\nFebrb6tLjuSWlkaiSMlomZrBMMbcAIz4veE0pfO3UoOK4z2kg6L2F8xkC+elSbxN\nog7zR+CEoWPGjCtTG0Pe0jm0zq4WoFCp3c6ZVW0XOWN4QmtVdxm7qepMwiv7QpIX\nB1rJhLHllGTbYmZEoJNAUNmMQdGlWnSHYyUJBr8AsHu52o1UylhA+uaTI935BFNj\n2VCQ3OPi1agncLQh0JrsHsxWqKRB7iMe9Aqn6HI3f4H2rPFdK5Hj9vI7GNeBpH/y\n3gqzLG/YmwiYzchwcsT09sUA1EBZ5whRLmnzX1rwwQKBgQDAGMP7XNIycRZQKGFo\nUsLYfsgXSgcs8kGCSvMDVXr98xD2iymx5yJkL3wNvHHPmIBJRW0/g4jq4c7AYjvU\nH1/ALClYBb1XtMOi4e8oWMbGRH/BA8hKUkC6idNOBgBENVxfWEGfwDwCC0jNjfAA\n0unbqxVXYdPKvN9mOlzBEiVXdQKBgQC3QYCIYFC8IrW7//QVKll9vmSAAvXS7Xm9\niZV2f7go8ei3Fjk3VXo+LURlz1jVWJ8LFNHxTjk4nX192CFv7uMkVIz9tUJZeBfG\n1Kf8m7I4x6TyikiDP230RUM9E2O/vbGmZLhaQFOvXRoF9qOwrShckG8eDGQ+OrQA\nC5s5+Q7p0QKBgDSiVIi6LSn/DHMYLWBtVNAHJQIkmYS6ODLgIGfocxPEFwDGrrz9\nLNIwpJgK61BLY9Mvv7hobQqWppTWFbiQhCbestFYeUHf2L73kxUGBijrOeoEBExA\n71VtUEWPpWELEe1Z/FkuTgLtXpxb6MgBAmzbGrTfrC1fxQJ4uVN5ilvFAoGBAKcZ\nbElugc+7WrmNv5RZJHcbV+q+SEdIUXz56ra96UA0rX3dHtkM8UWm4zpuolMP1x40\noucE6/pq6RYKMRsu2iGzk0h4soKAljWwjWky04UgzpB2dX5wJSPa0F/twUQChe3y\n44MwKt6551POvR4KFsao0Rm2NOXlg2KTMrzfFLExAoGAX2vxox33fMrVFpy3uc2t\nCFg7C4Cue7sVMADrjr21TZjhyYQTMzHZTxOxq7J2aRi7Kzx1lpNuc1UcrMEKYHO/\nSgxxv/ENAHnB6TxIPa1g74PHKtuHWwju0jTfEDN08Fp8MA7VhoPxxZ04XgPp5h+m\n3ahzHzkxZ0ZcXrYtuoAONxs=\n-----END PRIVATE KEY-----\n",
-  "client_email": "firebase-adminsdk-fbsvc@pos-system-eab23.iam.gserviceaccount.com",
-  "client_id": "101617743993490765963",
-  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-  "token_uri": "https://oauth2.googleapis.com/token",
-  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40pos-system-eab23.iam.gserviceaccount.com",
-  "universe_domain": "googleapis.com"
+  "project_info": {
+    "project_number": "666726160059",
+    "project_id": "pos-system-eab23",
+    "storage_bucket": "pos-system-eab23.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:666726160059:android:c9fa695c16f900c5c4fb9e",
+        "android_client_info": {
+          "package_name": "com.ilhamexalt33.posexpo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDa1-fre9saYyXQdj2wqYEBImSUAjLYiR8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
 }

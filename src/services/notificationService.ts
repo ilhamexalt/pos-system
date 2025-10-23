@@ -3,6 +3,7 @@ import * as Device from "expo-device";
 import { Platform } from "react-native";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "../config/firebase";
+import Constants from "expo-constants";
 
 export async function registerForPushNotificationsAsync(userId: string): Promise<string | undefined> {
     let token: string | undefined;
@@ -23,12 +24,26 @@ export async function registerForPushNotificationsAsync(userId: string): Promise
                 return;
             }
 
-            const tokenResponse = await Notifications.getExpoPushTokenAsync();
+            if (Platform.OS === "android") {
+                await Notifications.setNotificationChannelAsync("default", {
+                    name: "default",
+                    sound: "happy_bells.wav", // pastikan file ada di android/app/src/main/res/raw/
+                    importance: Notifications.AndroidImportance.MAX,
+                    vibrationPattern: [0, 250, 250, 250],
+                    lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
+                });
+            }
+
+            const projectId =
+                Constants?.expoConfig?.extra?.eas?.projectId ||
+                Constants?.easConfig?.projectId;
+
+            const tokenResponse = await Notifications.getExpoPushTokenAsync({
+                projectId
+            });
             token = tokenResponse.data;
-            console.log("Expo Push Token:", token);
 
             //  --- SIMPAN TOKEN KE FIRESTORE ---
-            console.log("Saving push token to Firestore with userId:", userId);
             if (token && userId) {
                 try {
                     const tokenRef = doc(db, "PushTokens", userId);
@@ -43,7 +58,7 @@ export async function registerForPushNotificationsAsync(userId: string): Promise
                         { merge: true }
                     );
 
-                    console.log("Token saved to Firestore successfully.");
+                    console.log("Token saved to Firestore successfully with userId:" + userId);
                 } catch (e) {
                     console.error("Gagal menyimpan token ke Firestore:", e);
                 }
@@ -53,16 +68,7 @@ export async function registerForPushNotificationsAsync(userId: string): Promise
             alert("Must use physical device for Push Notifications");
         }
 
-        if (Platform.OS === "android") {
-            await Notifications.setNotificationChannelAsync('default', {
-                name: 'A channel is needed for the permissions prompt to appear',
-                sound: 'happy_bells.wav',
-                importance: Notifications.AndroidImportance.MAX,
-                vibrationPattern: [0, 250, 250, 250],
-                lightColor: '#FF231F7C',
-                lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
-            });
-        }
+
     } catch (error) {
         console.log(error)
     }

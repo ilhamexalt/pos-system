@@ -65,6 +65,7 @@ const AppNavigation: React.FC = () => {
   const player = useAudioPlayer(AUDIO);
 
   useEffect(() => {
+    if (!userId) return;
     console.log("Setting up notification listeners...");
     registerForPushNotificationsAsync(userId || "");
 
@@ -95,7 +96,7 @@ const AppNavigation: React.FC = () => {
       notificationSub.remove();
       responseSub.remove();
     };
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
     initialize();

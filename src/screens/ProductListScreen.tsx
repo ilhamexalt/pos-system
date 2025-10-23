@@ -18,10 +18,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "../constants/Colors";
 import Loading from "../components/Loading";
-import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { useCashStore } from "../stores/cashStore";
 import { useAuthStore } from "../stores/authStore";
-// type Props = NativeStackScreenProps<RootStackParamList, "ProductList">;
 type Props = BottomTabScreenProps<RootStackParamList, "ProductList">;
 
 const audioSource = require("../../assets/sound/ya-allah-cantik-banget.mp3");
@@ -134,15 +132,14 @@ export default function ProductListScreen({ navigation }: Props) {
         {/* HEADER */}
         <View style={styles.header}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
-            <FontAwesome6 name="dollar" size={16} color={Colors.black} />
-            <Text style={styles.cashOnHandText}>
-              {loadingCash ? (
-                <ActivityIndicator size="small" color={Colors.black} />
-              ) : (
-                (cash[0]?.nominal || 0).toLocaleString("id-ID") || "0"
-              )}{" "}
-              (COH)
-            </Text>
+            {loadingCash ? (
+              <ActivityIndicator size="small" color={Colors.black} />
+            ) : (
+              <Text style={styles.cashOnHandText}>
+                Rp {(cash[0]?.nominal || 0).toLocaleString("id-ID") || "0"}{" "}
+                (COH)
+              </Text>
+            )}
           </View>
 
           <View style={{ flexDirection: "row", alignItems: "center", gap: 20 }}>

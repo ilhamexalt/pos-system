@@ -46,7 +46,7 @@ export interface Notification {
 
 export type RootStackParamList = {
   Login: undefined;
-  ProductList: undefined;
+  ProductList: { hideTabBar?: boolean } | undefined;
   Cart: undefined;
   Checkout: undefined;
   Notifications: undefined;

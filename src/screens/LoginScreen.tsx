@@ -10,6 +10,7 @@ import {
   Image,
   Platform,
   KeyboardAvoidingView,
+  ScrollView,
 } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types";
@@ -60,92 +61,101 @@ export default function LoginScreen({ navigation }: Props) {
   };
 
   return (
-    // <View style={styles.container}>
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
-    >
-      <Text style={styles.title}>POS System</Text>
-      <Image
-        source={require("../../assets/images/login.png")}
-        style={styles.image}
-      />
-      <View style={styles.inputContainer}>
-        <Ionicons
-          name="mail-outline"
-          size={20}
-          color={Colors.secondary}
-          style={styles.icon}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          autoCapitalize="none"
-          keyboardType="email-address"
-          value={email}
-          onChangeText={setEmail}
-          placeholderTextColor={Colors.secondary}
-        />
-      </View>
-
-      <View style={styles.inputContainer}>
-        <Ionicons
-          name="lock-closed-outline"
-          size={20}
-          color={Colors.secondary}
-          style={styles.icon}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          secureTextEntry={!showPassword}
-          value={password}
-          onChangeText={setPassword}
-          placeholderTextColor={Colors.secondary}
-        />
-        <TouchableOpacity
-          onPress={() => setShowPassword(!showPassword)}
-          style={styles.eyeIcon}
-        >
-          <Ionicons
-            name={showPassword ? "eye-outline" : "eye-off-outline"}
-            size={20}
-            color={Colors.secondary}
-          />
-        </TouchableOpacity>
-      </View>
-
-      <TouchableOpacity
-        onPressIn={pressIn}
-        onPressOut={pressOut}
-        onPress={handleLogin}
-        style={[
-          styles.button,
-          { backgroundColor: loading ? Colors.secondary : Colors.primary },
-        ]}
-        activeOpacity={0.9}
-        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-        disabled={loading}
+    <View style={styles.container}>
+      <KeyboardAvoidingView
+        behavior="padding"
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : -50}
+        style={styles.keyboardAvoidingView}
       >
-        {loading ? (
-          <ActivityIndicator size="small" color={Colors.white} />
-        ) : (
-          <Text style={styles.buttonText}>Login</Text>
-        )}
-      </TouchableOpacity>
+        <ScrollView
+          contentContainerStyle={{
+            flexGrow: 1,
+            justifyContent: "center",
+          }}
+          keyboardShouldPersistTaps="handled"
+        >
+          <Text style={styles.title}>POS System</Text>
+          <Image
+            source={require("../../assets/images/login.png")}
+            style={styles.image}
+          />
+          <View style={styles.inputContainer}>
+            <Ionicons
+              name="mail-outline"
+              size={20}
+              color={Colors.secondary}
+              style={styles.icon}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Email"
+              autoCapitalize="none"
+              keyboardType="email-address"
+              value={email}
+              onChangeText={setEmail}
+              placeholderTextColor={Colors.secondary}
+            />
+          </View>
 
-      <Modal
-        type="alert"
-        visible={!!errorMessage}
-        message={errorMessage}
-        iconName="alert-circle-outline"
-        iconColor={Colors.red}
-        onClose={() => setErrorMessage("")}
-      />
-    </KeyboardAvoidingView>
+          <View style={styles.inputContainer}>
+            <Ionicons
+              name="lock-closed-outline"
+              size={20}
+              color={Colors.secondary}
+              style={styles.icon}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Password"
+              secureTextEntry={!showPassword}
+              value={password}
+              onChangeText={setPassword}
+              placeholderTextColor={Colors.secondary}
+            />
+            <TouchableOpacity
+              onPress={() => setShowPassword(!showPassword)}
+              style={styles.eyeIcon}
+              activeOpacity={0.8}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Ionicons
+                name={showPassword ? "eye-outline" : "eye-off-outline"}
+                size={20}
+                color={Colors.secondary}
+              />
+            </TouchableOpacity>
+          </View>
 
-    // </View>
+          <TouchableOpacity
+            onPressIn={pressIn}
+            onPressOut={pressOut}
+            onPress={handleLogin}
+            style={[
+              styles.button,
+              { backgroundColor: loading ? Colors.lightGray : Colors.primary },
+            ]}
+            activeOpacity={0.9}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator size="small" color={Colors.white} />
+            ) : (
+              <Text style={styles.buttonText}>Login</Text>
+            )}
+          </TouchableOpacity>
+
+          <Modal
+            type="alert"
+            visible={!!errorMessage}
+            message={errorMessage}
+            iconName="alert-circle-outline"
+            iconColor={Colors.red}
+            onClose={() => setErrorMessage("")}
+          />
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </View>
   );
 }
 
@@ -153,14 +163,18 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
-    padding: 20,
     backgroundColor: Colors.white,
+  },
+  keyboardAvoidingView: {
+    flex: 1,
+    backgroundColor: Colors.white,
+    paddingHorizontal: 30,
   },
   title: {
     fontSize: 26,
     fontFamily: "MontserratBold",
     textAlign: "center",
-    marginBottom: 30,
+    marginBottom: 10,
     color: Colors.black,
   },
   inputContainer: {

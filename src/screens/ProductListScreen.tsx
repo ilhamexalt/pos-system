@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   FlatList,
@@ -25,21 +25,22 @@ type Props = BottomTabScreenProps<RootStackParamList, "ProductList">;
 const audioSource = require("../../assets/sound/ya-allah-cantik-banget.mp3");
 
 export default function ProductListScreen({ navigation }: Props) {
+  const id = useAuthStore((state) => state.user?.id);
   const [products, setProducts] = useState<Product[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
+
+  // CART
   const addToCart = useCartStore((state) => state.addToCart);
   const getTotalItems = useCartStore((state) => state.getTotalItems);
   const totalItems = useCartStore((state) =>
     state.items.reduce((sum, item) => sum + item.quantity, 0)
   );
 
+  // NOTIF
   const notifications = useNotificationStore((state) => state.notifications);
   const unreadCount = notifications.filter((n) => !n.is_read).length;
   const player = useAudioPlayer(audioSource);
   const [prevCount, setPrevCount] = useState(unreadCount);
-  const [refreshing, setRefreshing] = useState(false);
-  const { fetchCash, cash, loading: loadingCash } = useCashStore();
-  const { role, setRole } = useAuthStore();
-  const id = useAuthStore((state) => state.user?.id);
   const fetchNotifications = useNotificationStore(
     (state) => state.fetchNotifications
   );
@@ -47,6 +48,12 @@ export default function ProductListScreen({ navigation }: Props) {
     (state) => state.subscribeToNotifications
   );
   const unsubscribe = useNotificationStore((state) => state.unsubscribe);
+
+  // CASH
+  const { fetchCash, cash, loading: loadingCash } = useCashStore();
+
+  // ROLE
+  const { role, setRole } = useAuthStore();
 
   const fetchProducts = async () => {
     const { data, error } = await supabase
@@ -63,6 +70,7 @@ export default function ProductListScreen({ navigation }: Props) {
 
   const onRefresh = async () => {
     setRefreshing(true);
+    await fetchCash();
     await fetchProducts();
     setRefreshing(false);
   };
@@ -83,18 +91,9 @@ export default function ProductListScreen({ navigation }: Props) {
   }, [fetchNotifications, subscribeToNotifications, unsubscribe]);
 
   useEffect(() => {
-    // Ambil data awal
     fetchCash();
     fetchProducts();
   }, []);
-
-  // useEffect(() => {
-  //   if (unreadCount > prevCount) {
-  //     player.seekTo(0);
-  //     player.play();
-  //   }
-  //   setPrevCount(unreadCount);
-  // }, [unreadCount]);
 
   useEffect(() => {
     if (role !== "" && role !== null) {
@@ -207,12 +206,10 @@ const styles = StyleSheet.create({
   },
   badge: {
     position: "absolute",
-    top: 0,
+    top: -5,
     right: -5,
     backgroundColor: Colors.red,
-    borderRadius: 10,
-    paddingHorizontal: 5,
-    paddingVertical: 1,
+    borderRadius: 50,
     minWidth: 18,
     alignItems: "center",
     justifyContent: "center",

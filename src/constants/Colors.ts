@@ -10,6 +10,7 @@ const black = '#151718';
 const pink = '#DE3163';
 const amaranth = "#9F2B68"
 const gray = "#687076"
+const lightGray = "#E0E0E0"
 const whiteSmoke ="#F5F5F5"
 const red = "#df1b1b"
 const green = "#008000"
@@ -36,13 +37,15 @@ export const Colors = {
     tabIconSelected: tintColorDark,
   }, */
   
+  lightGray,
+  gray,
   primary: pink,
   secondary: darkBlue,
-  white: white,
-  whiteSmoke: whiteSmoke,
-  black: black,
-  red: red,
-  green: green,
-  blackTransparent: blackTransparent,
+  white,
+  whiteSmoke,
+  black,
+  red,
+  green,
+  blackTransparent,
   yellow: amber,
 };

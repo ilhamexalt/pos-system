@@ -141,6 +141,7 @@ const AppNavigation: React.FC = () => {
           component={ProductListScreen}
           options={{ title: "Home" }}
         />
+
         <Tab.Screen
           name="Transactions"
           component={TransactionScreen}
@@ -199,13 +200,7 @@ const AppNavigation: React.FC = () => {
             <Stack.Screen name="Login" component={LoginScreen} />
           ) : (
             <>
-              <Stack.Screen
-                name="Main"
-                component={Tabs}
-                options={{
-                  title: "",
-                }}
-              />
+              <Stack.Screen name="Main" component={Tabs} />
               <Stack.Screen
                 name="Notifications"
                 component={NotificationScreen}

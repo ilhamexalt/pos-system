@@ -17,6 +17,7 @@ export const useCashStore = create<CashState>((set) => ({
     const { data, error } = await supabase
       .from('cash')
       .select('*')
+      .order('updated_at', { ascending: false })
       .limit(1)
       .single(); 
 

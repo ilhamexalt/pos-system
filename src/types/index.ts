@@ -55,10 +55,19 @@ export type RootStackParamList = {
   Account: undefined;
   AddTransaction: undefined;
   Products: undefined;
+  CashHistory: undefined;
 };
 
 export interface Cash {
   id: string;
   nominal: number;
   updated_at: string | null;
+}
+
+// Tipe data untuk baris cash
+export interface CashEntry {
+  id: number;
+  nominal: number;
+  desc: string;
+  updated_at: string;
 }

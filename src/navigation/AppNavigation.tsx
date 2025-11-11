@@ -36,6 +36,7 @@ import {
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { useAudioPlayer } from "expo-audio";
+import CashHistoryScreen from "../screens/CashHistoryScreen";
 
 export const navigationRef =
   React.createRef<NavigationContainerRef<RootStackParamList>>();
@@ -233,6 +234,14 @@ const AppNavigation: React.FC = () => {
                 component={ProductScreen}
                 options={{
                   title: "Products",
+                  headerShown: true,
+                }}
+              />
+              <Stack.Screen
+                name="CashHistory"
+                component={CashHistoryScreen}
+                options={{
+                  title: "Cash History",
                   headerShown: true,
                 }}
               />

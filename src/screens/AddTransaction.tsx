@@ -23,6 +23,8 @@ export default function AddTransaction() {
   const user = useAuthStore((state) => state.user);
   const [message, setMessage] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("cash");
+  const [platform, setPlatform] = useState("offline");
+  const [category, setCategory] = useState("buying");
 
   const formatToIDR = (value: string) => {
     const numericValue = value.replace(/[^0-9]/g, "");
@@ -44,7 +46,6 @@ export default function AddTransaction() {
   };
 
   const getRawValue = (formattedValue: string) => {
-    // Hapus semua titik (pemisah ribuan) dan koma (pemisah desimal jika ada)
     return Number(formattedValue.replace(/\./g, ""));
   };
 
@@ -55,7 +56,6 @@ export default function AddTransaction() {
     }
 
     setLoading(true);
-    // const parsedAmount = parseFloat(amount.replace(/,/g, ""));
     const parsedAmount = getRawValue(amount);
 
     const { error: transactionError } = await supabase
@@ -64,10 +64,11 @@ export default function AddTransaction() {
         user_uid: user?.id,
         amount: parsedAmount,
         status: "completed",
-        category: "buying",
-        type: "outcome",
+        category,
+        type: category === "buying" ? "outcome" : "income",
         description,
         payment_method: paymentMethod,
+        platform,
       });
 
     setLoading(false);
@@ -75,23 +76,43 @@ export default function AddTransaction() {
     if (transactionError) {
       setMessage(transactionError.message);
     } else {
-      if (paymentMethod === "cash") {
+      if (paymentMethod.toLowerCase() === "cash") {
         const { data: cashData, error: cashError } = await supabase
           .from("cash")
-          .select("*")
+          .select("nominal")
+          .order("updated_at", { ascending: false })
           .limit(1)
           .single();
 
-        if (cashError) throw cashError;
+        if (cashError && cashError.code !== "PGRST116") {
+          throw cashError;
+        }
 
-        const newAmount = (cashData.amount || 0) - parsedAmount;
+        const oldNominal = cashData ? cashData.nominal : 0;
 
-        const { error: updateCashError } = await supabase
-          .from("cash")
-          .update({ nominal: newAmount })
-          .eq("id", cashData.id);
+        let newNominal: number;
+        let transactionDesc: string;
 
-        if (updateCashError) throw updateCashError;
+        const isBuying = category.toLowerCase() === "buying";
+
+        if (isBuying) {
+          newNominal = oldNominal - parsedAmount;
+          const decreaseAmount = parsedAmount;
+          transactionDesc = `Saldo telah berkurang ${decreaseAmount}. Saldo sebelumnya: ${oldNominal} menjadi: ${newNominal}`;
+        } else {
+          newNominal = oldNominal + parsedAmount;
+          const increaseAmount = parsedAmount;
+          transactionDesc = `Saldo telah bertambah ${increaseAmount}. Saldo sebelumnya: ${oldNominal} menjadi: ${newNominal}`;
+        }
+
+        const newDescription = transactionDesc;
+
+        const { error: insertCashError } = await supabase.from("cash").insert({
+          nominal: newNominal,
+          desc: newDescription,
+        });
+
+        if (insertCashError) throw insertCashError;
       }
 
       setMessage("Transaction added successfully!");
@@ -106,6 +127,32 @@ export default function AddTransaction() {
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={{ flex: 1 }}
       >
+        <Text style={styles.label}>Category</Text>
+        <View style={styles.paymentContainer}>
+          <TouchableOpacity
+            style={[
+              styles.paymentOption,
+              category === "buying" && styles.paymentSelected,
+            ]}
+            onPress={() => setCategory("buying")}
+            activeOpacity={0.9}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <Text style={styles.label}>Buying</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.paymentOption,
+              category === "selling" && styles.paymentSelected,
+            ]}
+            onPress={() => setCategory("selling")}
+            activeOpacity={0.9}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <Text style={styles.label}>Selling</Text>
+          </TouchableOpacity>
+        </View>
+
         <Text style={styles.label}>
           Amount <Text style={{ color: Colors.red }}>*</Text>
         </Text>
@@ -130,6 +177,56 @@ export default function AddTransaction() {
           style={styles.textarea}
           placeholderTextColor={Colors.secondary}
         />
+
+        <Text style={styles.label}>Platform</Text>
+        <View style={styles.paymentContainer}>
+          <TouchableOpacity
+            style={[
+              styles.paymentOption,
+              platform === "offline" && styles.paymentSelected,
+            ]}
+            onPress={() => setPlatform("offline")}
+            activeOpacity={0.9}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <Text style={styles.label}>Offline</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.paymentOption,
+              platform === "gojek" && styles.paymentSelected,
+            ]}
+            onPress={() => setPlatform("gojek")}
+            activeOpacity={0.9}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <Text style={styles.label}>Gojek</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.paymentOption,
+              platform === "grab" && styles.paymentSelected,
+            ]}
+            onPress={() => setPlatform("grab")}
+            activeOpacity={0.9}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <Text style={styles.label}>Grab</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.paymentOption,
+              platform === "shopee" && styles.paymentSelected,
+            ]}
+            onPress={() => setPlatform("shopee")}
+            activeOpacity={0.9}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <Text style={styles.label}>Shopee</Text>
+          </TouchableOpacity>
+        </View>
 
         <Text style={styles.label}>Choose payment method</Text>
         <View style={styles.paymentContainer}>
@@ -257,6 +354,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginHorizontal: 5,
     backgroundColor: Colors.white,
+    justifyContent: "center",
+    alignContent: "center",
   },
   paymentSelected: {
     backgroundColor: "transparent",

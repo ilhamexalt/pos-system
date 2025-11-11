@@ -47,10 +47,11 @@ export default function CheckoutScreen({ navigation }: Props) {
     try {
       let cashData: Cash | null = null;
       let currentCash = 0;
-      if (paymentMethod === "cash") {
+      if (paymentMethod.toLowerCase() === "cash") {
         const { data, error } = await supabase
           .from("cash")
           .select("*")
+          .order("updated_at", { ascending: false })
           .limit(1)
           .single();
 
@@ -91,20 +92,23 @@ export default function CheckoutScreen({ navigation }: Props) {
 
         if (transactionError) throw transactionError;
 
-        if (paymentMethod === "cash") {
+        if (paymentMethod.toLowerCase() === "cash") {
           currentCash += totalItem;
         }
 
-        // Update table cash jika paymentMethod cash
-        if (paymentMethod === "cash" && cashData) {
-          const { error: updateCashError } = await supabase
-            .from("cash")
-            .update({
-              nominal: currentCash,
-            })
-            .eq("id", cashData.id);
+        // add new row table cash jika paymentMethod cash
+        if (paymentMethod.toLowerCase() === "cash" && cashData) {
+          const amountAdded = (item.price || 0) * item.quantity;
+          const description = `Saldo telah bertambah ${amountAdded}. Saldo baru: ${currentCash}`;
 
-          if (updateCashError) throw updateCashError;
+          const { error: insertCashError } = await supabase
+            .from("cash")
+            .insert({
+              nominal: currentCash,
+              desc: description,
+            });
+
+          if (insertCashError) throw insertCashError;
         }
       }
       setLoading(false);

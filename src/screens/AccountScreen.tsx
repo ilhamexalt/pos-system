@@ -102,6 +102,11 @@ export default function AccountScreen({ navigation }: Props) {
 
   const accountMenuItems = [
     {
+      iconName: "money-bill-wave",
+      labelText: "Cash History",
+      onPress: () => navigation.navigate("CashHistory"),
+    },
+    {
       iconName: "user-gear",
       labelText: "Edit Profile",
       onPress: () => setErrorMessage("Feature Not Available"),

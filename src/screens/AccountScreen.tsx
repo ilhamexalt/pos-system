@@ -117,7 +117,7 @@ export default function AccountScreen({ navigation }: Props) {
       onPress: () => navigation.navigate("AddTransaction"),
     },
     {
-      iconName: "file-archive",
+      iconName: "box-open",
       labelText: "Products",
       onPress: () => {
         if (role === "admin") {

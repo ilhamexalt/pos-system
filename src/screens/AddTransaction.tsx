@@ -9,6 +9,7 @@ import {
   StyleSheet,
   ActivityIndicator,
   Image,
+  ScrollView,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { supabase } from "../config/supabase";
@@ -126,156 +127,161 @@ export default function AddTransaction() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={{ flex: 1 }}
       >
-        <Text style={styles.label}>Category</Text>
-        <View style={styles.paymentContainer}>
-          <TouchableOpacity
-            style={[
-              styles.paymentOption,
-              category === "buying" && styles.paymentSelected,
-            ]}
-            onPress={() => setCategory("buying")}
-            activeOpacity={0.9}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
-            <Text style={styles.label}>Buying</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.paymentOption,
-              category === "selling" && styles.paymentSelected,
-            ]}
-            onPress={() => setCategory("selling")}
-            activeOpacity={0.9}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
-            <Text style={styles.label}>Selling</Text>
-          </TouchableOpacity>
-        </View>
-
-        <Text style={styles.label}>
-          Amount <Text style={{ color: Colors.red }}>*</Text>
-        </Text>
-        <TextInput
-          value={amount}
-          // onChangeText={setAmount}
-          onChangeText={handleAmountChange}
-          placeholder="e.g., 100000"
-          keyboardType="numeric"
-          style={styles.input}
-          placeholderTextColor={Colors.secondary}
-        />
-
-        <Text style={styles.label}>
-          Description <Text style={{ color: Colors.red }}>*</Text>
-        </Text>
-        <TextInput
-          value={description}
-          onChangeText={setDescription}
-          placeholder="e.g., Bought office supplies"
-          multiline
-          style={styles.textarea}
-          placeholderTextColor={Colors.secondary}
-        />
-
-        <Text style={styles.label}>Platform</Text>
-        <View style={styles.paymentContainer}>
-          <TouchableOpacity
-            style={[
-              styles.paymentOption,
-              platform === "offline" && styles.paymentSelected,
-            ]}
-            onPress={() => setPlatform("offline")}
-            activeOpacity={0.9}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
-            <Ionicons name="storefront-outline" size={24} color="black" />
-            <Text style={styles.platformLabel}>Offline</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.paymentOption,
-              platform === "gojek" && styles.paymentSelected,
-            ]}
-            onPress={() => setPlatform("gojek")}
-            activeOpacity={0.9}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
-            <Image source={gojekLogo} style={styles.platformLogo} />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.paymentOption,
-              platform === "grab" && styles.paymentSelected,
-            ]}
-            onPress={() => setPlatform("grab")}
-            activeOpacity={0.9}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
-            <Image source={grabLogo} style={styles.platformLogo} />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.paymentOption,
-              platform === "shopee" && styles.paymentSelected,
-            ]}
-            onPress={() => setPlatform("shopee")}
-            activeOpacity={0.9}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
-            <Image source={shopeeLogo} style={styles.platformLogo} />
-          </TouchableOpacity>
-        </View>
-
-        <Text style={styles.label}>Choose payment method</Text>
-        <View style={styles.paymentContainer}>
-          <TouchableOpacity
-            style={[
-              styles.paymentOption,
-              paymentMethod === "cash" && styles.paymentSelected,
-            ]}
-            onPress={() => setPaymentMethod("cash")}
-            activeOpacity={0.9}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
-            <FontAwesome6 name="money-bill-1" size={24} color="black" />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.paymentOption,
-              paymentMethod === "qris" && styles.paymentSelected,
-            ]}
-            onPress={() => setPaymentMethod("qris")}
-            activeOpacity={0.9}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
-            <Ionicons name="qr-code-outline" size={24} color="black" />
-          </TouchableOpacity>
-        </View>
-
-        <TouchableOpacity
-          onPress={handleSubmit}
-          disabled={loading}
-          activeOpacity={0.9}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          style={[
-            styles.button,
-            { backgroundColor: loading ? Colors.secondary : Colors.primary },
-          ]}
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
         >
-          {loading ? (
-            <ActivityIndicator size="small" color={Colors.white} />
-          ) : (
-            <Text style={styles.buttonText}>Add Transaction</Text>
-          )}
-        </TouchableOpacity>
+          <Text style={styles.label}>Category</Text>
+          <View style={styles.paymentContainer}>
+            <TouchableOpacity
+              style={[
+                styles.paymentOption,
+                category === "buying" && styles.paymentSelected,
+              ]}
+              onPress={() => setCategory("buying")}
+              activeOpacity={0.9}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Text style={styles.label}>Buying</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.paymentOption,
+                category === "selling" && styles.paymentSelected,
+              ]}
+              onPress={() => setCategory("selling")}
+              activeOpacity={0.9}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Text style={styles.label}>Selling</Text>
+            </TouchableOpacity>
+          </View>
+
+          <Text style={styles.label}>
+            Amount <Text style={{ color: Colors.red }}>*</Text>
+          </Text>
+          <TextInput
+            value={amount}
+            // onChangeText={setAmount}
+            onChangeText={handleAmountChange}
+            placeholder="e.g., 100000"
+            keyboardType="numeric"
+            style={styles.input}
+            placeholderTextColor={Colors.secondary}
+          />
+
+          <Text style={styles.label}>
+            Description <Text style={{ color: Colors.red }}>*</Text>
+          </Text>
+          <TextInput
+            value={description}
+            onChangeText={setDescription}
+            placeholder="e.g., Bought office supplies"
+            multiline
+            style={styles.textarea}
+            placeholderTextColor={Colors.secondary}
+          />
+
+          <Text style={styles.label}>Platform</Text>
+          <View style={styles.paymentContainer}>
+            <TouchableOpacity
+              style={[
+                styles.paymentOption,
+                platform === "offline" && styles.paymentSelected,
+              ]}
+              onPress={() => setPlatform("offline")}
+              activeOpacity={0.9}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Ionicons name="storefront-outline" size={24} color="black" />
+              <Text style={styles.platformLabel}>Offline</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.paymentOption,
+                platform === "gojek" && styles.paymentSelected,
+              ]}
+              onPress={() => setPlatform("gojek")}
+              activeOpacity={0.9}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Image source={gojekLogo} style={styles.platformLogo} />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.paymentOption,
+                platform === "grab" && styles.paymentSelected,
+              ]}
+              onPress={() => setPlatform("grab")}
+              activeOpacity={0.9}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Image source={grabLogo} style={styles.platformLogo} />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.paymentOption,
+                platform === "shopee" && styles.paymentSelected,
+              ]}
+              onPress={() => setPlatform("shopee")}
+              activeOpacity={0.9}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Image source={shopeeLogo} style={styles.platformLogo} />
+            </TouchableOpacity>
+          </View>
+
+          <Text style={styles.label}>Choose payment method</Text>
+          <View style={styles.paymentContainer}>
+            <TouchableOpacity
+              style={[
+                styles.paymentOption,
+                paymentMethod === "cash" && styles.paymentSelected,
+              ]}
+              onPress={() => setPaymentMethod("cash")}
+              activeOpacity={0.9}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Ionicons name="cash-outline" size={24} color="black" />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.paymentOption,
+                paymentMethod === "qris" && styles.paymentSelected,
+              ]}
+              onPress={() => setPaymentMethod("qris")}
+              activeOpacity={0.9}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Ionicons name="qr-code-outline" size={24} color="black" />
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity
+            onPress={handleSubmit}
+            disabled={loading}
+            activeOpacity={0.9}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            style={[
+              styles.button,
+              { backgroundColor: loading ? Colors.secondary : Colors.primary },
+            ]}
+          >
+            {loading ? (
+              <ActivityIndicator size="small" color={Colors.white} />
+            ) : (
+              <Text style={styles.buttonText}>Add Transaction</Text>
+            )}
+          </TouchableOpacity>
+        </ScrollView>
       </KeyboardAvoidingView>
 
       <Modal
@@ -301,6 +307,9 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 16,
     paddingTop: 10,
+  },
+  scrollContent: {
+    paddingBottom: 40,
   },
   label: {
     fontSize: 14,

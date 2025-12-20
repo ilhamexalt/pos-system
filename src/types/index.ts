@@ -34,6 +34,7 @@ export interface Transaction {
   description: string | null;
   created_at: string | null;
   payment_method: string | null;
+  platform: string | null;
 }
 
 export interface Notification {

@@ -20,6 +20,7 @@ import { Colors } from "../constants/Colors";
 import Loading from "../components/Loading";
 import { useCashStore } from "../stores/cashStore";
 import { useAuthStore } from "../stores/authStore";
+import Modal from "../components/Modal";
 type Props = BottomTabScreenProps<RootStackParamList, "ProductList">;
 
 const audioSource = require("../../assets/sound/ya-allah-cantik-banget.mp3");
@@ -28,6 +29,8 @@ export default function ProductListScreen({ navigation }: Props) {
   const id = useAuthStore((state) => state.user?.id);
   const [products, setProducts] = useState<Product[]>([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [showReminder, setShowReminder] = useState(false);
+  const [lastReminderTime, setLastReminderTime] = useState<string | null>(null);
 
   // CART
   const addToCart = useCartStore((state) => state.addToCart);
@@ -121,8 +124,38 @@ export default function ProductListScreen({ navigation }: Props) {
     fetchRole();
   }, [id, setRole]);
 
+  // Check time for reminder from 22:50 to 23:59
+  useEffect(() => {
+    const checkTime = () => {
+      const now = new Date();
+      const hours = now.getHours();
+      const minutes = now.getMinutes();
+      const totalMinutes = hours * 60 + minutes;
+
+      // 22:50 = 1370 minutes, 23:59 = 1439 minutes
+      const startTime = 22 * 60 + 50; // 22:50
+      const endTime = 23 * 60 + 59;   // 23:59
+
+      const todayKey = now.toDateString();
+
+      // Show reminder if within 22:50 - 23:59 and not shown today
+      if (totalMinutes >= startTime && totalMinutes <= endTime) {
+        if (lastReminderTime !== todayKey) {
+          setShowReminder(true);
+          setLastReminderTime(todayKey);
+        }
+      }
+    };
+
+    // Check immediately and then every minute
+    checkTime();
+    const interval = setInterval(checkTime, 60000);
+
+    return () => clearInterval(interval);
+  }, [lastReminderTime]);
+
   if (products.length < 1 && !refreshing) {
-    return <Loading visible={true} onRequestClose={() => {}} />;
+    return <Loading visible={true} onRequestClose={() => { }} />;
   }
 
   return (
@@ -176,6 +209,8 @@ export default function ProductListScreen({ navigation }: Props) {
         <FlatList
           data={products}
           keyExtractor={(item) => item.id.toString()}
+          numColumns={2}
+          columnWrapperStyle={styles.row}
           renderItem={({ item }) => (
             <ProductCard product={item} onAddToCart={addToCart} />
           )}
@@ -183,6 +218,24 @@ export default function ProductListScreen({ navigation }: Props) {
           onRefresh={onRefresh}
         />
       </View>
+
+      {/* Reminder Modal */}
+      <Modal
+        type="action"
+        visible={showReminder}
+        onClose={() => setShowReminder(false)}
+        onConfirm={() => setShowReminder(false)}
+        confirmText="OK, Mengerti"
+        hiddenButtonCancel
+      >
+        <View style={{ alignItems: "center", paddingVertical: 10 }}>
+          <Text style={{ fontSize: 40, marginBottom: 10 }}>📝</Text>
+          <Text style={styles.reminderTitle}>Reminder</Text>
+          <Text style={styles.reminderText}>
+            Catat Penjualan Sebelum 23:59 WIB
+          </Text>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -223,5 +276,20 @@ const styles = StyleSheet.create({
     color: Colors.black,
     fontSize: 20,
     fontFamily: "MontserratRegular",
+  },
+  row: {
+    justifyContent: "space-between",
+  },
+  reminderTitle: {
+    fontSize: 20,
+    fontFamily: "MontserratBold",
+    color: Colors.black,
+    marginBottom: 8,
+  },
+  reminderText: {
+    fontSize: 14,
+    fontFamily: "MontserratRegular",
+    color: Colors.secondary,
+    textAlign: "center",
   },
 });

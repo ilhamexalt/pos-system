@@ -8,6 +8,7 @@ import {
   Platform,
   StyleSheet,
   ActivityIndicator,
+  Image,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { supabase } from "../config/supabase";
@@ -15,6 +16,11 @@ import { Colors } from "../constants/Colors";
 import { useAuthStore } from "../stores/authStore";
 import Modal from "../components/Modal";
 import { FontAwesome6, Ionicons } from "@expo/vector-icons";
+
+// Platform images
+const gojekLogo = require("../../assets/images/gojek.png");
+const grabLogo = require("../../assets/images/grab.png");
+const shopeeLogo = require("../../assets/images/shopee.png");
 
 export default function AddTransaction() {
   const [amount, setAmount] = useState("");
@@ -97,12 +103,10 @@ export default function AddTransaction() {
 
         if (isBuying) {
           newNominal = oldNominal - parsedAmount;
-          const decreaseAmount = parsedAmount;
-          transactionDesc = `Saldo telah berkurang ${decreaseAmount}. Saldo sebelumnya: ${oldNominal} menjadi: ${newNominal}`;
+          transactionDesc = `Saldo berkurang karena pembelian. ${description}. Nominal: Rp ${parsedAmount.toLocaleString("id-ID")}`;
         } else {
           newNominal = oldNominal + parsedAmount;
-          const increaseAmount = parsedAmount;
-          transactionDesc = `Saldo telah bertambah ${increaseAmount}. Saldo sebelumnya: ${oldNominal} menjadi: ${newNominal}`;
+          transactionDesc = `Saldo bertambah dari penjualan. ${description}. Nominal: Rp ${parsedAmount.toLocaleString("id-ID")}`;
         }
 
         const newDescription = transactionDesc;
@@ -189,7 +193,8 @@ export default function AddTransaction() {
             activeOpacity={0.9}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
-            <Text style={styles.label}>Offline</Text>
+            <Ionicons name="storefront-outline" size={24} color="black" />
+            <Text style={styles.platformLabel}>Offline</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[
@@ -200,7 +205,7 @@ export default function AddTransaction() {
             activeOpacity={0.9}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
-            <Text style={styles.label}>Gojek</Text>
+            <Image source={gojekLogo} style={styles.platformLogo} />
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -212,7 +217,7 @@ export default function AddTransaction() {
             activeOpacity={0.9}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
-            <Text style={styles.label}>Grab</Text>
+            <Image source={grabLogo} style={styles.platformLogo} />
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -224,7 +229,7 @@ export default function AddTransaction() {
             activeOpacity={0.9}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
-            <Text style={styles.label}>Shopee</Text>
+            <Image source={shopeeLogo} style={styles.platformLogo} />
           </TouchableOpacity>
         </View>
 
@@ -294,71 +299,102 @@ export default function AddTransaction() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 24,
-    backgroundColor: Colors.whiteSmoke,
+    paddingHorizontal: 16,
+    paddingTop: 10,
   },
   label: {
-    fontSize: 16,
-    marginBottom: 8,
-    color: Colors.black,
-    fontFamily: "MontserratRegular",
+    fontSize: 14,
+    marginBottom: 10,
+    color: Colors.secondary,
+    fontFamily: "MontserratSemiBold",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
   },
   input: {
-    borderWidth: 1,
-    borderColor: Colors.whiteSmoke,
-    borderRadius: 10,
-    padding: 12,
+    borderWidth: 0,
+    borderRadius: 12,
+    padding: 16,
     marginBottom: 20,
     backgroundColor: Colors.white,
-    fontFamily: "MontserratRegular",
+    fontFamily: "MontserratSemiBold",
+    fontSize: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
   textarea: {
-    borderWidth: 1,
-    borderColor: Colors.whiteSmoke,
-    borderRadius: 10,
-    padding: 12,
+    borderWidth: 0,
+    borderRadius: 12,
+    padding: 16,
     marginBottom: 20,
     backgroundColor: Colors.white,
-    minHeight: 80,
+    minHeight: 100,
     textAlignVertical: "top",
     fontFamily: "MontserratRegular",
+    fontSize: 14,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
   button: {
-    paddingVertical: 12,
-    borderRadius: 10,
+    paddingVertical: 16,
+    borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 10,
-    height: 50,
-    // shadowColor: Colors.primary,
-    // shadowOpacity: 0.2,
-    // shadowRadius: 5,
-    // elevation: 3,
+    marginTop: 20,
+    height: 56,
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
   buttonText: {
     color: Colors.white,
     fontSize: 16,
-    fontFamily: "MontserratSemiBold",
+    fontFamily: "MontserratBold",
+    letterSpacing: 0.5,
   },
   paymentContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 30,
+    marginBottom: 24,
+    gap: 8,
   },
   paymentOption: {
     flex: 1,
-    borderWidth: 1,
-    borderColor: Colors.white,
-    borderRadius: 10,
-    paddingVertical: 14,
+    borderWidth: 2,
+    borderColor: "transparent",
+    borderRadius: 12,
+    paddingVertical: 16,
     alignItems: "center",
-    marginHorizontal: 5,
     backgroundColor: Colors.white,
     justifyContent: "center",
-    alignContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
   paymentSelected: {
-    backgroundColor: "transparent",
+    backgroundColor: Colors.white,
     borderColor: Colors.primary,
+    shadowColor: Colors.primary,
+    shadowOpacity: 0.2,
+  },
+  platformLabel: {
+    fontSize: 10,
+    marginTop: 6,
+    color: Colors.black,
+    fontFamily: "MontserratSemiBold",
+  },
+  platformLogo: {
+    width: 32,
+    height: 32,
+    resizeMode: "contain",
   },
 });

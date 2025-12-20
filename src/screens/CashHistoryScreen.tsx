@@ -55,23 +55,61 @@ const CashHistoryScreen = () => {
     fetchCashData();
   }, [fetchCashData]);
 
+  // Helper function to get reason for balance change
+  const getChangeReason = (desc: string): { reason: string; isDecrease: boolean } => {
+    const lowerDesc = desc.toLowerCase();
+
+    if (lowerDesc.includes("berkurang")) {
+      // Cek alasan berkurang
+      if (lowerDesc.includes("pembelian") || lowerDesc.includes("buying")) {
+        return { reason: "Pembelian Barang", isDecrease: true };
+      } else if (lowerDesc.includes("pengeluaran") || lowerDesc.includes("outcome")) {
+        return { reason: "Pengeluaran", isDecrease: true };
+      } else if (lowerDesc.includes("tarik") || lowerDesc.includes("withdraw")) {
+        return { reason: "Penarikan Tunai", isDecrease: true };
+      }
+      return { reason: "Saldo Berkurang", isDecrease: true };
+    } else if (lowerDesc.includes("bertambah")) {
+      // Cek alasan bertambah
+      if (lowerDesc.includes("penjualan") || lowerDesc.includes("selling")) {
+        return { reason: "Penjualan", isDecrease: false };
+      } else if (lowerDesc.includes("pemasukan") || lowerDesc.includes("income")) {
+        return { reason: "Pemasukan", isDecrease: false };
+      } else if (lowerDesc.includes("setor") || lowerDesc.includes("deposit")) {
+        return { reason: "Setoran Tunai", isDecrease: false };
+      }
+      return { reason: "Saldo Bertambah", isDecrease: false };
+    }
+
+    return { reason: desc || "Tidak ada keterangan", isDecrease: false };
+  };
+
   const renderItem = ({ item }: { item: CashEntry }) => {
-    const isDecrease = item.desc.toLowerCase().includes("berkurang");
+    const { reason, isDecrease } = getChangeReason(item.desc);
+
     return (
       <View style={styles.itemContainer}>
         <View style={styles.row}>
-          <Text
-            style={[styles.nominalText, isDecrease && styles.nominalDecrease]}
-          >
-            {format().formatCurrency(item.nominal)}
-          </Text>
+          <View style={{ flex: 1 }}>
+            <Text
+              style={[styles.nominalText, isDecrease && styles.nominalDecrease]}
+            >
+              {isDecrease ? "- " : "+ "}
+              {format().formatCurrency(item.nominal)}
+            </Text>
+            <Text style={[styles.reasonText, isDecrease && { color: Colors.red }]}>
+              {reason}
+            </Text>
+          </View>
           <Text style={styles.dateText}>
             {format().formatDateToCustom(item.updated_at)}
           </Text>
         </View>
-        <Text style={[styles.descText, isDecrease && { color: Colors.red }]}>
-          Deskripsi: {item.desc}
-        </Text>
+        {item.desc && (
+          <Text style={styles.descText} numberOfLines={2}>
+            {item.desc}
+          </Text>
+        )}
       </View>
     );
   };
@@ -117,8 +155,8 @@ const CashHistoryScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 24,
-    backgroundColor: Colors.whiteSmoke,
+    padding: 10,
+    paddingBottom: 0,
   },
   centered: {
     flex: 1,
@@ -127,14 +165,15 @@ const styles = StyleSheet.create({
   },
   itemContainer: {
     backgroundColor: Colors.white,
-    padding: 15,
-    borderRadius: 16,
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
     marginBottom: 10,
   },
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 5,
+    alignItems: "flex-start",
   },
   nominalText: {
     fontSize: 16,
@@ -149,10 +188,17 @@ const styles = StyleSheet.create({
     color: Colors.gray,
     fontFamily: "MontserratRegular",
   },
+  reasonText: {
+    fontSize: 12,
+    color: Colors.green,
+    fontFamily: "MontserratSemiBold",
+    marginTop: 2,
+  },
   descText: {
-    fontSize: 14,
+    fontSize: 12,
     color: Colors.gray,
     fontFamily: "MontserratRegular",
+    marginTop: 8,
   },
   errorText: {
     color: "red",

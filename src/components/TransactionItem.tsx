@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Transaction } from "../types";
@@ -9,7 +9,7 @@ interface Props {
   transaction: Transaction;
 }
 
-export default function TransactionItem({ transaction }: Props) {
+function TransactionItem({ transaction }: Props) {
   const isIncome = transaction.type === "income";
 
   return (
@@ -34,7 +34,12 @@ export default function TransactionItem({ transaction }: Props) {
             )}
           </Text>
           <Text style={styles.subText}>
-            {format().capitalizeEachWord(transaction.status)}
+            {
+              [transaction.platform, transaction.payment_method]
+                .filter(Boolean)
+                .join(" - ")
+                .toUpperCase() || "N/A"
+            }
           </Text>
 
           {transaction.created_at && (
@@ -59,6 +64,13 @@ export default function TransactionItem({ transaction }: Props) {
     </View>
   );
 }
+
+// Memoize component to prevent unnecessary re-renders
+export default memo(TransactionItem, (prevProps, nextProps) => {
+  return prevProps.transaction.id === nextProps.transaction.id &&
+    prevProps.transaction.amount === nextProps.transaction.amount &&
+    prevProps.transaction.status === nextProps.transaction.status;
+});
 
 const styles = StyleSheet.create({
   card: {
